@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Force Constant to Pressure Converter</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eaecef;
+            padding-bottom: 15px;
+        }
+        
+        .converter-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+        }
+        
+        h2 {
+            color: #3498db;
+            margin-top: 0;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f4fc;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .result-item {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #d1e7f5;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .result-label {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .explanation {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #3498db;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .converter-section {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Force Constant to Pressure Converter</h1>
+        
+        <div class="converter-section">
+            <h2>Force Constant to Pressure</h2>
+            <div class="input-group">
+                <label for="k-value">Force Constant (kJ/mol/nm):</label>
+                <input type="number" id="k-value" step="any" placeholder="e.g., 20.3226">
+            </div>
+            <div class="input-group">
+                <label for="x-dim">X Dimension (nm):</label>
+                <input type="number" id="x-dim" step="any" placeholder="e.g., 6.7">
+            </div>
+            <div class="input-group">
+                <label for="y-dim">Y Dimension (nm):</label>
+                <input type="number" id="y-dim" step="any" placeholder="e.g., 6.7">
+            </div>
+            <button id="convert-to-pressure">Convert to Pressure</button>
+            
+            <div class="results" id="pressure-results">
+                <h3>Results:</h3>
+                <div class="result-item">
+                    <span class="result-label">Area:</span> <span id="area-result">-</span> nm²
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Force:</span> <span id="force-result">-</span> MPa·nm²
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Pressure:</span> <span id="pressure-mpa">-</span> MPa
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Pressure:</span> <span id="pressure-bar">-</span> bar
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Pressure:</span> <span id="pressure-gpa">-</span> GPa
+                </div>
+            </div>
+        </div>
+        
+        <div class="converter-section">
+            <h2>Pressure to Force Constant</h2>
+            <div class="input-group">
+                <label for="pressure-value">Pressure (MPa):</label>
+                <input type="number" id="pressure-value" step="any" placeholder="e.g., 1.0">
+            </div>
+            <div class="input-group">
+                <label for="x-dim2">X Dimension (nm):</label>
+                <input type="number" id="x-dim2" step="any" placeholder="e.g., 6.7">
+            </div>
+            <div class="input-group">
+                <label for="y-dim2">Y Dimension (nm):</label>
+                <input type="number" id="y-dim2" step="any" placeholder="e.g., 6.7">
+            </div>
+            <button id="convert-to-force">Convert to Force Constant</button>
+            
+            <div class="results" id="force-results">
+                <h3>Results:</h3>
+                <div class="result-item">
+                    <span class="result-label">Area:</span> <span id="area-result2">-</span> nm²
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Force Constant:</span> <span id="force-constant">-</span> kJ/mol/nm
+                </div>
+            </div>
+        </div>
+        
+        <div class="explanation">
+            <h3>About this Converter</h3>
+            <p>This tool converts between force constants (used in molecular dynamics simulations like GROMACS) and pressure values. The conversion factor used is 1.6605390671738, which converts kJ/mol/nm to MPa/nm².</p>
+            <p><strong>Formula for Force Constant to Pressure:</strong> P = k × conversion_factor × (x × y)</p>
+            <p><strong>Formula for Pressure to Force Constant:</strong> k = P / (x × y) / conversion_factor</p>
+        </div>
+    </div>
+
+    <script>
+        // Conversion factor
+        const convertor = 1.6605390671738;
+        
+        // Force Constant to Pressure conversion
+        document.getElementById('convert-to-pressure').addEventListener('click', function() {
+            const k = parseFloat(document.getElementById('k-value').value);
+            const x = parseFloat(document.getElementById('x-dim').value);
+            const y = parseFloat(document.getElementById('y-dim').value);
+            
+            if (isNaN(k) || isNaN(x) || isNaN(y)) {
+                alert('Please enter valid numbers for all fields.');
+                return;
+            }
+            
+            // Convert k from kJ/mol/nm -> MPa/nm-2
+            const k_p = k * convertor;
+            
+            // Area in nm^2
+            const area_nm2 = x * y;
+            
+            // Pressure (in J/nm^3 = MPa)
+            const P_MPa = k_p * area_nm2;
+            
+            // Convert to bar and GPa
+            const P_bar = P_MPa * 10;
+            const P_GPa = P_MPa / 1000;
+            
+            // Display results
+            document.getElementById('area-result').textContent = area_nm2.toFixed(3);
+            document.getElementById('force-result').textContent = k_p.toFixed(3);
+            document.getElementById('pressure-mpa').textContent = P_MPa.toFixed(3);
+            document.getElementById('pressure-bar').textContent = P_bar.toFixed(3);
+            document.getElementById('pressure-gpa').textContent = P_GPa.toFixed(6);
+            
+            // Show results section
+            document.getElementById('pressure-results').style.display = 'block';
+        });
+        
+        // Pressure to Force Constant conversion
+        document.getElementById('convert-to-force').addEventListener('click', function() {
+            const P = parseFloat(document.getElementById('pressure-value').value);
+            const x = parseFloat(document.getElementById('x-dim2').value);
+            const y = parseFloat(document.getElementById('y-dim2').value);
+            
+            if (isNaN(P) || isNaN(x) || isNaN(y)) {
+                alert('Please enter valid numbers for all fields.');
+                return;
+            }
+            
+            // Area in nm^2
+            const area_nm2 = x * y;
+            
+            // Calculate k_p
+            const k_p = P / area_nm2;
+            
+            // Convert k from MPa/nm-2 -> kJ/mol/nm
+            const k_gmx = k_p / convertor;
+            
+            // Display results
+            document.getElementById('area-result2').textContent = area_nm2.toFixed(3);
+            document.getElementById('force-constant').textContent = k_gmx.toFixed(6);
+            
+            // Show results section
+            document.getElementById('force-results').style.display = 'block';
+        });
+    </script>
+</body>
+</html>
