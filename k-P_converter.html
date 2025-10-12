@@ -199,72 +199,69 @@
         </div>
     </div>
 
-    <script>
-        // Conversion factor
-        const convertor = 1.6605390671738;
-        
-        // Force Constant to Pressure conversion
-        document.getElementById('convert-to-pressure').addEventListener('click', function() {
-            const k = parseFloat(document.getElementById('k-value').value);
-            const x = parseFloat(document.getElementById('x-dim').value);
-            const y = parseFloat(document.getElementById('y-dim').value);
-            
-            if (isNaN(k) || isNaN(x) || isNaN(y)) {
-                alert('Please enter valid numbers for all fields.');
-                return;
-            }
-            
-            // Convert k from kJ/mol/nm -> MPa/nm-2
-            const k_p = k * convertor;
-            
-            // Area in nm^2
-            const area_nm2 = x * y;
-            
-            // Pressure (in J/nm^3 = MPa)
-            const P_MPa = k_p * area_nm2;
-            
-            // Convert to bar and GPa
-            const P_bar = P_MPa * 10;
-            const P_GPa = P_MPa / 1000;
-            
-            // Display results
-            document.getElementById('area-result').textContent = area_nm2.toFixed(3);
-            document.getElementById('force-result').textContent = k_p.toFixed(3);
-            document.getElementById('pressure-mpa').textContent = P_MPa.toFixed(3);
-            document.getElementById('pressure-bar').textContent = P_bar.toFixed(3);
-            document.getElementById('pressure-gpa').textContent = P_GPa.toFixed(6);
-            
-            // Show results section
-            document.getElementById('pressure-results').style.display = 'block';
-        });
-        
-        // Pressure to Force Constant conversion
-        document.getElementById('convert-to-force').addEventListener('click', function() {
-            const P = parseFloat(document.getElementById('pressure-value').value);
-            const x = parseFloat(document.getElementById('x-dim2').value);
-            const y = parseFloat(document.getElementById('y-dim2').value);
-            
-            if (isNaN(P) || isNaN(x) || isNaN(y)) {
-                alert('Please enter valid numbers for all fields.');
-                return;
-            }
-            
-            // Area in nm^2
-            const area_nm2 = x * y;
-            
-            // Calculate k_p
-            const k_p = P / area_nm2;
-            
-            // Convert k from MPa/nm-2 -> kJ/mol/nm
-            const k_gmx = k_p / convertor;
-            
-            // Display results
-            document.getElementById('area-result2').textContent = area_nm2.toFixed(3);
-            document.getElementById('force-constant').textContent = k_gmx.toFixed(6);
-            
-            // Show results section
-            document.getElementById('force-results').style.display = 'block';
-        });
-    </script>
+<script>
+    // Conversion factor: 1 kJ mol^-1 nm^-1 -> 1.6605390671738 pN
+    const CONVERT_K_TO_pN = 1.6605390671738;
+
+    // k -> Pressure conversion (k in kJ/mol/nm, x,y in nm)
+    document.getElementById('convert-to-pressure').addEventListener('click', function() {
+        const k = parseFloat(document.getElementById('k-value').value);      // kJ/mol/nm
+        const x = parseFloat(document.getElementById('x-dim').value);       // nm
+        const y = parseFloat(document.getElementById('y-dim').value);       // nm
+
+        if (isNaN(k) || isNaN(x) || isNaN(y)) {
+            alert('Please enter valid numbers for k, x and y (units: k in kJ/mol/nm, x/y in nm).');
+            return;
+        }
+
+        const area_nm2 = x * y; // nm^2
+
+        // Force in pN
+        const F_pN = k * CONVERT_K_TO_pN;
+
+        // Pressure in MPa: P (MPa) = F(pN) / area(nm^2) because 1 pN/nm^2 = 1 MPa
+        const P_MPa = F_pN / area_nm2;
+
+        // Convert to bar and GPa
+        const P_bar = P_MPa * 10.0;
+        const P_GPa = P_MPa / 1000.0;
+
+        // Display results
+        document.getElementById('area-result').textContent = area_nm2.toFixed(6);
+        document.getElementById('force-result').textContent = F_pN.toFixed(6) + ' pN';
+        document.getElementById('pressure-mpa').textContent = P_MPa.toFixed(6) + ' MPa';
+        document.getElementById('pressure-bar').textContent = P_bar.toFixed(6) + ' bar';
+        document.getElementById('pressure-gpa').textContent = P_GPa.toFixed(9) + ' GPa';
+
+        document.getElementById('pressure-results').style.display = 'block';
+    });
+
+    // Pressure -> k conversion (P in MPa, x,y in nm)
+    document.getElementById('convert-to-force').addEventListener('click', function() {
+        const P_MPa = parseFloat(document.getElementById('pressure-value').value); // MPa
+        const x = parseFloat(document.getElementById('x-dim2').value);            // nm
+        const y = parseFloat(document.getElementById('y-dim2').value);            // nm
+
+        if (isNaN(P_MPa) || isNaN(x) || isNaN(y)) {
+            alert('Please enter valid numbers for pressure (MPa), x and y (nm).');
+            return;
+        }
+
+        const area_nm2 = x * y;
+
+        // Force in pN: F(pN) = P(MPa) * area(nm^2) because 1 MPa = 1 pN/nm^2
+        const F_pN = P_MPa * area_nm2;
+
+        // Convert to GROMACS k (kJ/mol/nm): k = F(pN) / convertor
+        const k_gmx = F_pN / CONVERT_K_TO_pN;
+
+        // Display results
+        document.getElementById('area-result2').textContent = area_nm2.toFixed(6);
+        document.getElementById('force-constant').textContent = k_gmx.toFixed(6) + ' kJ·mol⁻¹·nm⁻¹';
+
+        document.getElementById('force-results').style.display = 'block';
+    });
+</script>
+
 </body>
 </html>
