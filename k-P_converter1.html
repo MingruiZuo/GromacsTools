@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Force Constant ⇄ Pressure Converter (corrected)</title>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f5f7fa; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 900px; margin: 0 auto; background-color: white; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 30px; }
+        h1 { text-align: center; color: #2c3e50; margin-bottom: 20px; }
+        .converter-section { margin-bottom: 30px; padding: 18px; border-radius: 8px; background-color: #f8f9fa; }
+        label { display: block; margin-bottom: 6px; font-weight: 600; }
+        input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px; }
+        button { background-color: #3498db; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        .results { margin-top: 18px; padding: 12px; background-color: #e8f4fc; border-radius: 4px; display: none; }
+        .result-item { margin-bottom: 8px; }
+        .result-label { font-weight: 700; color: #2c3e50; }
+        .explanation { margin-top: 22px; padding: 14px; background-color: #fff8e6; border-left: 4px solid #f39c12; font-size: 14px; line-height: 1.5; }
+        code { background: #eef6fb; padding: 2px 6px; border-radius: 4px; }
+        @media (max-width: 600px) { .container { padding: 15px; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Force Constant ⇄ Pressure Converter (已校正)</h1>
+
+        <div class="converter-section">
+            <h2>从 GROMACS 的 Force Constant (k) → 压强 (Pressure)</h2>
+            <div class="input-group">
+                <label for="k-value">Force constant k (单位: <strong>kJ·mol⁻¹·nm⁻¹</strong>)</label>
+                <input type="number" id="k-value" step="any" placeholder="e.g., 50">
+            </div>
+            <div class="input-group">
+                <label for="x-dim">活塞 X 尺寸 (nm)</label>
+                <input type="number" id="x-dim" step="any" placeholder="e.g., 10">
+            </div>
+            <div class="input-group">
+                <label for="y-dim">活塞 Y 尺寸 (nm)</label>
+                <input type="number" id="y-dim" step="any" placeholder="e.g., 10">
+            </div>
+            <button id="convert-to-pressure">Convert to Pressure</button>
+
+            <div class="results" id="pressure-results">
+                <h3>结果 (单位已标注)</h3>
+                <div class="result-item"><span class="result-label">面积:</span> <span id="area-result">-</span> nm²</div>
+                <div class="result-item"><span class="result-label">等效力:</span> <span id="force-result">-</span> pN</div>
+                <div class="result-item"><span class="result-label">压强:</span> <span id="pressure-mpa">-</span> MPa</div>
+                <div class="result-item"><span class="result-label">压强:</span> <span id="pressure-bar">-</span> bar</div>
+                <div class="result-item"><span class="result-label">压强:</span> <span id="pressure-gpa">-</span> GPa</div>
+            </div>
+        </div>
+
+        <div class="converter-section">
+            <h2>从 压强 (Pressure) → GROMACS Force Constant (k)</h2>
+            <div class="input-group">
+                <label for="pressure-value">Pressure (MPa)</label>
+                <input type="number" id="pressure-value" step="any" placeholder="e.g., 1.0">
+            </div>
+            <div class="input-group">
+                <label for="x-dim2">活塞 X 尺寸 (nm)</label>
+                <input type="number" id="x-dim2" step="any" placeholder="e.g., 10">
+            </div>
+            <div class="input-group">
+                <label for="y-dim2">活塞 Y 尺寸 (nm)</label>
+                <input type="number" id="y-dim2" step="any" placeholder="e.g., 10">
+            </div>
+            <button id="convert-to-force">Convert to Force Constant</button>
+
+            <div class="results" id="force-results">
+                <h3>结果</h3>
+                <div class="result-item"><span class="result-label">面积:</span> <span id="area-result2">-</span> nm²</div>
+                <div class="result-item"><span class="result-label">GROMACS k:</span> <span id="force-constant">-</span> kJ·mol⁻¹·nm⁻¹</div>
+                <div class="result-item"><small>注: constant-force 模式下 k 的单位为 kJ·mol⁻¹·nm⁻¹（等效力单位）。</small></div>
+            </div>
+        </div>
+
+        <div class="explanation">
+            <h3>关于本转换器（关键说明）</h3>
+            <p>已修正的关键点：<br>
+            - <strong>压强 = 力 / 面积</strong> (不是力 × 面积)。<br>
+            - 先把 GROMACS 的 <code>k</code> (kJ·mol⁻¹·nm⁻¹) 转为力 (pN): <code>F(pN) = k × 1.6605390671738</code>。<br>
+            - 然后把力除以面积得到压强 (MPa): <code>P(MPa) = F(pN) / area(nm²)</code>。<br>
+            - 反向计算时先用 <code>F(pN) = P(MPa) × area(nm²)</code>，再 <code>k = F(pN) / 1.6605390671738</code>。</p>
+
+            <p>常用换算:</p>
+            <ul>
+                <li>1 kJ·mol⁻¹·nm⁻¹ ≈ 1.6605390671738 pN</li>
+                <li>1 pN/nm² = 1 MPa</li>
+                <li>1 bar = 0.1 MPa</li>
+            </ul>
+
+            <p>示例: 若活塞面积为 100 nm², k = 50 kJ·mol⁻¹·nm⁻¹ → F ≈ 83.03 pN → P ≈ 0.8303 MPa ≈ 8.303 bar。</p>
+        </div>
+    </div>
+
+    <script>
+        // convertor: 1 kJ/mol/nm -> pN
+        const CONVERT_K_TO_pN = 1.6605390671738;
+
+        // k -> Pressure conversion
+        document.getElementById('convert-to-pressure').addEventListener('click', function() {
+            const k = parseFloat(document.getElementById('k-value').value);
+            const x = parseFloat(document.getElementById('x-dim').value);
+            const y = parseFloat(document.getElementById('y-dim').value);
+
+            if (isNaN(k) || isNaN(x) || isNaN(y)) {
+                alert('Please enter valid numbers for k (kJ/mol/nm), x and y (nm).');
+                return;
+            }
+
+            const area_nm2 = x * y; // nm^2
+
+            // Force in pN
+            const F_pN = k * CONVERT_K_TO_pN;
+
+            // Pressure in MPa: P (MPa) = F(pN) / area(nm^2) because 1 pN/nm^2 = 1 MPa
+            const P_MPa = F_pN / area_nm2;
+
+            // Convert to bar and GPa
+            const P_bar = P_MPa * 10.0;
+            const P_GPa = P_MPa / 1000.0;
+
+            // Display results
+            document.getElementById('area-result').textContent = area_nm2.toFixed(6);
+            document.getElementById('force-result').textContent = F_pN.toFixed(6);
+            document.getElementById('pressure-mpa').textContent = P_MPa.toFixed(6);
+            document.getElementById('pressure-bar').textContent = P_bar.toFixed(6);
+            document.getElementById('pressure-gpa').textContent = P_GPa.toFixed(9);
+
+            document.getElementById('pressure-results').style.display = 'block';
+        });
+
+        // Pressure -> k conversion
+        document.getElementById('convert-to-force').addEventListener('click', function() {
+            const P_MPa = parseFloat(document.getElementById('pressure-value').value);
+            const x = parseFloat(document.getElementById('x-dim2').value);
+            const y = parseFloat(document.getElementById('y-dim2').value);
+
+            if (isNaN(P_MPa) || isNaN(x) || isNaN(y)) {
+                alert('Please enter valid numbers for pressure (MPa), x and y (nm).');
+                return;
+            }
+
+            const area_nm2 = x * y;
+
+            // Force in pN: F(pN) = P(MPa) * area(nm^2)
+            const F_pN = P_MPa * area_nm2;
+
+            // Convert to GROMACS k (kJ/mol/nm): k = F(pN) / convertor
+            const k_gmx = F_pN / CONVERT_K_TO_pN;
+
+            // Display results
+            document.getElementById('area-result2').textContent = area_nm2.toFixed(6);
+            document.getElementById('force-constant').textContent = k_gmx.toFixed(6);
+
+            document.getElementById('force-results').style.display = 'block';
+        });
+    </script>
+</body>
+</html>
